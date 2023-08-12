@@ -1,0 +1,56 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+import statistics
+
+# Initialization
+theta_0 = 50
+sigma_0 = 1
+sigma = 5
+n = 30
+
+# Realization of theta
+theta = norm.rvs(theta_0, sigma_0) 
+print("theta = ", theta)
+
+theta_1 = np.zeros(n)
+x_bar = np.zeros(n)
+x = np.zeros(n)
+
+for i in range(n):
+    # Sampling 
+    nu = norm.rvs(0, sigma)
+    x[i] = theta + nu 
+
+    # Calssic estimation
+    if i >= 1:
+        x_bar[i] = (x_bar[i-1] * i + x[i]) / (i + 1) 
+    else:
+        x_bar[0] = x[0]
+
+    # Bayesian estimation
+    sigma_1_pow2 = sigma**2 / (i+1) * sigma_0**2 / (sigma_0**2 + sigma**2 / (i+1))
+    theta_1[i] = sigma_1_pow2 / sigma_0**2 * theta_0 + (i+1) * sigma_1_pow2 / sigma**2 * x_bar[i]
+
+
+
+
+plt.plot(np.arange(n), theta * np.ones(n), label='Theta')
+plt.plot(np.arange(n), x_bar, label='Classic estimation')
+plt.plot(np.arange(n), theta_1, label='Bayesian estimation')
+plt.legend()
+plt.xlabel("Number of samples")
+plt.ylabel("Value")
+plt.show() 
+
+
+
+
+
+"""
+x = np.sort(x)
+plt.plot(x, norm.pdf(x, statistics.mean(x), statistics.stdev(x)))
+plt.show()
+"""
+
